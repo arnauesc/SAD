@@ -34,18 +34,33 @@ class EditableBufferedReader extends BufferedReader {
         }
 
     }
+        //Keys
+    /*
+ Right:	ESC [ C
+ Left:	ESC [ D
+ Home:	ESC O H, ESC [ 1 ~ (keypad)
+ End:	ESC O F, ESC [ 4 ~ (keypad)
+ Insert:	ESC [ 2 ~
+ Delete:	ESC [ 3 ~
+    */ 
 
     public int read(){
         int i, valor = 0;
         try {
             i = super.read();
             if(i!=Key.ESC){
-                return  i;
+                if(i== Key.DEL){
+                    return Shortcuts.DEL;
+                }else{
+                    return  i;
+                }
             }
             if((i = super.read()) == Key.BRACKET){
                 switch (i=super.read()) {
                     case Key.SUPR:
-                        valor = Shortcuts.SUPR;
+                        if(super.read()=='~'){
+                            valor = Shortcuts.SUPR;
+                        }
                         break;
                     case Key.L:
                         valor = Shortcuts.L;
@@ -58,14 +73,10 @@ class EditableBufferedReader extends BufferedReader {
                             valor= Shortcuts.INS;
                         }
                     case Key.HOME:
-                        if(super.read()=='~'){
-                            valor = Shortcuts.HOME;
-                        }
+                        valor = Shortcuts.HOME;
                         break;
                     case Key.END:
-                        if(super.read()=='~'){
-                             valor = Shortcuts.END;
-                        }
+                        valor = Shortcuts.END;
                     default:
                        break;
                     }
@@ -100,16 +111,19 @@ class EditableBufferedReader extends BufferedReader {
             car = (char) this.read();
             switch (car) {
                 case Shortcuts.DEL:
-
+                    line.delete();
                     break;
             
                 case Shortcuts.END:
+                    line.fin();
                     break;
                 
                 case Shortcuts.HOME:
+                    line.ini();
                     break;
 
                 case Shortcuts.INS:
+                    line.insertMode();
                     break;
                 
                 case Shortcuts.L:
@@ -121,10 +135,11 @@ class EditableBufferedReader extends BufferedReader {
                     break;
                 
                 case Shortcuts.SUPR:
+                    line.supr();
                     break;
 
                 default:
-                    line.insert(car);
+                    line.add(car);
                     break;
             }
             
@@ -135,3 +150,5 @@ class EditableBufferedReader extends BufferedReader {
         return r;
     }
 }
+
+//per poder calcular les columnes i les linies de la consola s'ha d'utlitzar la funció  System.getenv("COLUMNS") Y  System.getenv("LINES")

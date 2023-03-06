@@ -11,8 +11,8 @@ public class Shortcuts{
      static final int INS = 6;
 
      //Escape codes
-     static final String MOVE_R= "\033[1D";
-     static final String MOVE_L= "\033[1C";
+     static final String MOVE_R= "\033[1C";
+     static final String MOVE_L= "\033[1D";
      static final String ESC="\033";
      static final String WRITE="\033[4h";
      static final String OVERWRITE="\033[4l";

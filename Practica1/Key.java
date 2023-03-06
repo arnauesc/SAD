@@ -10,7 +10,7 @@ public class Key{
  Insert:	ESC [ 2 ~
  Delete:	ESC [ 3 ~
     */
-      
+
      static final int INS = 50; //
      static final int SUPR = 51; //3 Delete on the right
      static final int ESC = 27; //^[
