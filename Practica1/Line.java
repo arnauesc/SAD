@@ -66,6 +66,7 @@ public class Line{
 
     public void insertMode(){
         this.insert=!this.insert;
+
     }
 
     public void supr(){

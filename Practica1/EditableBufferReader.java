@@ -68,12 +68,11 @@ class EditableBufferedReader extends BufferedReader {
                     case Key.R:
                         valor = Shortcuts.R;
                         break;
+                        
                     case Key.INS:
                         if(super.read()=='~'){
                             valor= Shortcuts.INS;
                         }
-                    case Key.HOME:
-                        valor = Shortcuts.HOME;
                         break;
                     case Key.END:
                         valor = Shortcuts.END;
