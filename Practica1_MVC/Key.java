@@ -20,6 +20,5 @@ public class Key{
      static final int BRACKET = 91; //[
      static final int HOME = 72; //H
      static final int END = 70; //F
-     static final int MOUSE = 'M';
 
 }

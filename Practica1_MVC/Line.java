@@ -1,5 +1,7 @@
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeSupport;
 
-public class Line{ 
+public class Line extends PropertyChangeSupport{ 
     int position;
     boolean insert=false;
     StringBuffer sb;
@@ -9,6 +11,14 @@ public class Line{
     public Line(){
         sb = new StringBuffer(BUFFERCAPACITY); 
         this.position=0;
+        insert = false;
+    }
+    public int getPosition(){
+        return this.position;
+    }
+
+    public int getBufferLenght(){
+        return sb.length();
     }
 
     public void moveCursorR(){
@@ -81,22 +91,6 @@ public class Line{
         this.ini();
         System.out.print("LINE"+sb.toString());
         return sb.toString();
-    }
-
-    // Cx and Cy are the x and y coordinates of the mouse when the button was pressed.
-    // We can only move the cursor in one line cy=0 so we only need the value of cx
-    public void mouseClick(int Cx, int Cy) {
-        //if(Cy == 0) {
-            if(Cx > this.position) {
-                while(Cx > this.position) {
-                    this.moveCursorR();
-                }
-            }else {
-                    while(this.position> Cx) {
-                    this.moveCursorL();
-                }
-            }
-        //}
     }
 
 }
