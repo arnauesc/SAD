@@ -6,10 +6,11 @@ public class Consol implements PropertyChangeListener {
 
     public Consol(Line line){
         this.line =line;
+        this.line.addPropertyChangeListener(this);
     }
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        int seq = ((Integer)evt.getNewValue()).intValue();
+        int seq = (int)evt.getNewValue();
             switch (seq) {
                 case Shortcuts.R:
                     System.out.print(Shortcuts.MOVE_R);

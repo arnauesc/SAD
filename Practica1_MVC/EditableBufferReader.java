@@ -8,7 +8,7 @@ class EditableBufferedReader extends BufferedReader {
 
     public EditableBufferedReader(Reader in) {
         super(in);
-        line= new Line();
+        this.line= new Line();
     }
 
     public void setRaw() {
@@ -105,11 +105,12 @@ class EditableBufferedReader extends BufferedReader {
     }
 
     public String readLine() {
+        Consol consol = new Consol(this.line);
         this.setRaw();
-        char car = '\0';
+        int car;
 
         do  {
-            car = (char) this.read();
+            car =  this.read();
             switch (car) {
                 case Shortcuts.DEL:
                     line.delete();
@@ -140,7 +141,7 @@ class EditableBufferedReader extends BufferedReader {
                     break;
 
                 default:
-                    line.add(car);
+                    line.add((char)car);
                     break;
             }
             
