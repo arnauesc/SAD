@@ -1,4 +1,5 @@
 import java.beans.PropertyChangeSupport;
+import java.util.Scanner;
 import java.beans.PropertyChangeListener;
 
 public class Line { 
@@ -12,6 +13,12 @@ public class Line {
         this.position=0;
         this.insert = false;
         this.support = new PropertyChangeSupport(this);
+    }
+    public int getCursorRow(){
+        Scanner sc = new Scanner(System.in);
+        System.out.print("\033[6n");
+        sc.skip("\033\\[8;(\\d+);(\\d+)t");
+        return Integer.parseInt(sc.match().group(0));
     }
     //Aquesta funció ens permet afegir un oient a la llista per alertarlos si hi ha un canvi
     public void addPropertyChangeListener(PropertyChangeListener listener){
@@ -104,6 +111,20 @@ public class Line {
     public String toString(){
         this.ini();
         return sb.toString();
+    }
+
+    public void mouseClick(int Cx, int Cy) {
+        if(Cy == this.getCursorRow()){
+            if(Cx > this.position) {
+                while(Cx > this.position) {
+                    this.moveCursorR();
+                }
+            }else {
+                    while(this.position> Cx) {
+                    this.moveCursorL();
+                }
+            }
+        }
     }
 
 }

@@ -10,6 +10,7 @@ public class Shortcuts{
      static final int END = -6; //F
      static final int INS = -7;
      static final int NOINS = -8;
+     static final int MOUSE = -9;
 
      //Escape codes
      static final String MOVE_R= "\033[1C";
@@ -20,6 +21,7 @@ public class Shortcuts{
      static final String SUPRIMIR="\033[P";
      static final String CLEAR = "\033[2J";
      static final String INICI = "\033[0;0H";
-
+     static final String ACTIVATE_MOUSE="\033[?9h";
+     static final String DEACTIVATE_MOUSE="\033[?9l";
 
 }
