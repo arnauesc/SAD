@@ -45,6 +45,7 @@ public class MySocket {
     public void println(String line){
        try{
         pw.println(line);
+        pw.flush();
        } catch (Exception e){
         e.printStackTrace();
        }

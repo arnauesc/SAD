@@ -6,7 +6,7 @@ public class MyServerSocket {
     ServerSocket ss;
     public MyServerSocket(int port) {
         try {
-            ss = new ServerSocket(port);
+            this.ss = new ServerSocket(port);
         } catch (IOException e) {
             e.printStackTrace();
         }
