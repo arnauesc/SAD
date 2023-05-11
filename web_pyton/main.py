@@ -42,7 +42,7 @@ def get_weather_results(city, data):
 def translate(text, lang):
     translator = Translator()
     detection = translator.detect(text)
-    translation = translator.translate(text, src=detection.lang, dest=lang)
+    translation= translator.translate(text, src=detection.lang, dest=lang)
 
     return translation
 
@@ -103,6 +103,7 @@ def get_data(data):
     }
     send(content)
     input_string = data["data"].lower()
+    print(f"{input_string}")
     words = input_string.split()
     if input_string.find("weather") != -1:
         if len(words) >= 2:
@@ -120,9 +121,10 @@ def get_data(data):
         pass
 
     elif input_string.find("translate") != -1:
-        text_to_translate = ''
+        text_to_translate = ""
         for i in range(3, len(words)):
-            text_to_translate += words[i]+' '
+            text_to_translate += words[i]+" "
+            print(f"{words[i]}")
         translation = translate(text_to_translate, words[2])
         content = {
             "name": 'Server',
@@ -130,11 +132,12 @@ def get_data(data):
         }
         send(content)
         pass
-    elif input_string.find("Hola"):
+    elif input_string.find("hola"):
         content = {
             "name": 'Server',
             "message": "Hola! En que et puc ajudar? Prova de dir: \n Weather (Ciutat) --> Per saber el temps que fa en la ciutat elegida \n Translate to EN (La frase) --> Per traduir la frase que vulguis"
         }
+        send(content)
 
     print(f"{session.get('name')} said: {data['data']}")
 
