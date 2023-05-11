@@ -2,11 +2,10 @@ from flask import Flask, render_template, jsonify, request, session, redirect, u
 from flask_socketio import SocketIO, send
 import requests
 import datetime as dt
-import googletrans
-from googletrans import Translator
+import googletrans 
 from weather import get_weather_results, kelvin_to_celsius_fahrenheit 
 
-from translate import checkLanguageCode, translate
+from translate import checkLanguageCode, translate_text
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'esunsecret1234'
@@ -89,13 +88,10 @@ def get_data(data):
                 city += words[i]+' '
             print(city)
             error, weather_data= get_weather(city)
-            content = {
-                "name": 'Server',
-                "message": get_weather_results(city, weather_data, error)
-            }
-            send(content)
+            msg= get_weather_results(city, weather_data, error)
             print(f"Weather data: {get_weather_results(city,weather_data, error)}")
-        pass
+        else:
+            msg = "Incorrect input --> Weather [city]"
 
     elif words[0]=='translate':
         text_to_translate = ''
@@ -106,7 +102,7 @@ def get_data(data):
             #print(text_to_translate)
              #print(lang)
             if checkLanguageCode(lang):
-                translation = translate(text_to_translate, lang)
+                translation = translate_text(text_to_translate, lang)
                 msg= translation.text
             else:
                 link = "https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages "
@@ -114,19 +110,15 @@ def get_data(data):
                 msg = f'<a href="{link}">{link_text}</a>'
         else:
             msg = "Incorrect input --> Translate to [language code] [text to translate]"
-        content = {
-        "name": 'Server',
-        "message": msg
-        }
-        send(content)
         pass
     
     else: 
-        content = {
-        "name": 'Server',
-        "message": "Hi! How can I help you out? You can say: \n Weather [city] --> To know the weather in the selected city\n Translate to [language code] [text to translate] --> To translate the text you want\n Some common language codes are:\n EN (English)\n ES (Spanish)\n DE (German)\n FR (French)"          }
-        send(content)
-
+        msg="Hi! How can I help you out? You can say: \n Weather [city] --> To know the weather in the selected city\n Translate to [language code] [text to translate] --> To translate the text you want\n Some common language codes are:\n EN (English)\n ES (Spanish)\n DE (German)\n FR (French)" 
+    content = {
+    "name": 'Server',
+    "message": msg
+    }
+    send(content)
 
     print(f"{session.get('name')} said: {data['data']}")
 
