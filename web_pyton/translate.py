@@ -1,3 +1,4 @@
+from flask import logging
 import googletrans
 from googletrans import Translator
 
@@ -10,11 +11,14 @@ def checkLanguageCode(lang):
             return True
     return False
 
-def translate(text, lang):
+def translate_text(text, lang):
     translator = Translator()
     detection = translator.detect(text)
     print(detection.lang)
     print(lang)
-    translation= translator.translate(text, src=detection.lang, dest=lang)
-
+    try:
+        translation= translator.translate(text, src=detection.lang, dest=lang)
+    except TypeError as e:
+        logging.error(str(e))
+        
     return translation
