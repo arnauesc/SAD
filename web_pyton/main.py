@@ -5,6 +5,8 @@ import datetime as dt
 import googletrans
 from googletrans import Translator
 
+from translate import checkLanguageCode
+
 # app= create_app()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'esunsecret1234'
@@ -105,7 +107,7 @@ def get_data(data):
     input_string = data["data"].lower()
     print(f"{input_string}")
     words = input_string.split()
-    if input_string.find("weather") != -1:
+    if input_string("weather") != -1:
         if len(words) >= 2:
             city = ''
             for i in range(1, len(words)):
@@ -124,16 +126,28 @@ def get_data(data):
         text_to_translate = ""
         for i in range(3, len(words)):
             text_to_translate += words[i]+" "
-            print(f"{words[i]}")
-        translation = translate(text_to_translate, words[2])
+        lang= words[2]
+        if checkLanguageCode(lang):
+            translation = translate(text_to_translate, words[2])
+            msg= translation.text
+        else:
+            msg="Language not found. You can find the available languages here: https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages"
         content = {
-            "name": 'Server',
-            "message": translation.text
+        "name": 'Server',
+        "message": msg
         }
         send(content)
         pass
-    elif input_string.find("hola"):
-        content = {
+    else: 
+        if input_string.find("hola")!= -1:
+            content = {
+                "name": 'Server',
+              "message": "Hola! En que et puc ajudar? Prova de dir: \n Weather (Ciutat) --> Per saber el temps que fa en la ciutat elegida \n Translate to EN (La frase) --> Per traduir la frase que vulguis"
+            }
+            send(content)
+
+        elif input_string.find("Com estás?")!= -1:
+            content = {
             "name": 'Server',
             "message": "Hola! En que et puc ajudar? Prova de dir: \n Weather (Ciutat) --> Per saber el temps que fa en la ciutat elegida \n Translate to EN (La frase) --> Per traduir la frase que vulguis"
         }
