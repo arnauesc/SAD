@@ -1,9 +1,13 @@
+#Takes in a temperature in Kelvin and returns a tuple of two values
 def kelvin_to_celsius_fahrenheit(kelvin):
     celsius = kelvin - 273.15
     fahrenheit = celsius * (9/5) + 32
     return celsius, fahrenheit
 
 
+#Takes in a city name, a dictionary of weather data, and a boolean indicating whether there was an error getting the data
+# If there was an error, it returns a message saying that the city was not found. 
+# Otherwise, it uses the weather data to construct a message with several characteristics. 
 def get_weather_results(city, data, error=False):
     if error==True:
         result=f"City not found, try again\n Remember to type in: Weather [city]\n"
