@@ -1,50 +1,57 @@
 {% extends 'base.html' %}
-{% block content %} 
-<div class="screen-chat">
-    <div class="header">
-        <div class="logo">Xat</div> 
-        <button id="sortir-xat">Sortir</button>
-    </div>
-    <div class="messages" id="messages">
-    </div>
-    <div class="typebox">
-        <input type="text" placeholder="Missatge" name="message" id="message">
-        <button type="button" name="send" id="send-message" onclick="sendMessage()">Envia</button>
-    </div>
+{% block content %}
+<div method='post' class="screen-chat">
+  <div class="header">
+    <div class="logo">Xat</div>
+    <button id="exit">Sortir</button>
+  </div>
+  <div class="messages" id="messages">
+  </div>
+  <div class="typebox">
+    <input type="text" placeholder="Missatge" name="message" id="message">
+    <button type="button" name="send" id="send-message" onclick="sendMessage()">Envia</button>
+  </div>
 </div>
 <script type="text/javascript">
-    var socketio = io();
-  
-    const messages = document.getElementById("messages");
-  
-    const createMessage = (name, msg) => {
-      const content = `
-      <div class="text">
-        <span>
-            <strong>${name}</strong>: <pre> ${msg} </pre>
-        </span>
-        <span class="muted">
-            ${new Date().toLocaleString()}
-        </span>
-      </div> 
+  var socketio = io();
 
-      
-      `;
-      messages.innerHTML += content;
-    };
-  
-    socketio.on("message", (data) => {
-      createMessage(data.name, data.message);
-    });
-  
-    const sendMessage = () => {
-      const message = document.getElementById("message");
-      if (message.value == "") return;
-      socketio.emit("message", { data: message.value });
-      message.value = "";
-    };
-  </script>
-  {% for msg in messages %}
+  const messages = document.getElementById("messages");
+
+  const createMessage = (name, msg) => {
+    let content;
+    if (name == "Server") {
+      content = `
+      <div class="message missatge-servidor">
+        <div class="name">${name}</div>
+        <div class="text">${msg}</div>
+      </div>
+    `;
+    } else {
+      content = `
+      <div class="message missatge-usuari">
+        <div>
+          <div class="name">${name}</div>
+          <div class="text">${msg}</div>
+        </div>
+      </div>
+    `;
+    }
+    messages.innerHTML += content;
+  };
+
+  socketio.on("message", (data) => {
+    createMessage(data.name, data.message);
+  });
+
+  const sendMessage = () => {
+    const message = document.getElementById("message");
+    if (message.value == "") return;
+    socketio.emit("message", { data: message.value });
+    messages.scrollTop = messages.scrollHeight - messages.clientHeight;
+    message.value = "";
+  };
+</script>
+{% for msg in messages %}
 <script type="text/javascript">
   createMessage("{{msg.username}}", "{{msg.message}}");
 </script>

@@ -1,54 +1,18 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-from flask_socketio import SocketIO, emit, send
+from flask_socketio import SocketIO, send
 import requests
 import datetime as dt
 import googletrans
 from googletrans import Translator
+from weather import get_weather_results, kelvin_to_celsius_fahrenheit 
 
-from translate import checkLanguageCode
+from translate import checkLanguageCode, translate
 
-# app= create_app()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'esunsecret1234'
 socketio = SocketIO(app)
 
-
-def kelvin_to_celsius_fahrenheit(kelvin):
-    celsius = kelvin - 273.15
-    fahrenheit = celsius * (9/5) + 32
-    return celsius, fahrenheit
-
-
-def get_weather_results(city, data):
-    temp_celsius = data['temp_celsius']
-    temp_fahrenheit = data['temp_fahrenheit']
-    feels_like_celsius = data['feels_like_celsius']
-    feels_like_fahrenheit = data['feels_like_fahrenheit']
-    humidity = data['humidity']
-    wind_speed = data['wind_speed']
-    description = data['description']
-    sunrise_time = data['sunrise_time']
-    sunset_time = data['sunset_time']
-    sunrise_time = data['sunrise_time']
-
-    result = f"Temperature in {city}: {temp_celsius:.2f}ºC or {temp_fahrenheit:.2f}ºF \n" \
-        f"Temperature in {city} feels like: {feels_like_celsius:.2f}ºC or {feels_like_fahrenheit:.2f}ºF \n" \
-        f"Humidity in {city}: {humidity}% \n" \
-        f"Wind Speed in {city}: {wind_speed}m/s \n" \
-        f"General Weather in {city}: {description} \n" \
-        f"Sun rises in {city}: {sunrise_time} local time. \n" \
-        f"Sun sets in {city}: {sunset_time} local time."
-    return result
-
-
-def translate(text, lang):
-    translator = Translator()
-    detection = translator.detect(text)
-    translation= translator.translate(text, src=detection.lang, dest=lang)
-
-    return translation
-
-
+#Controladores de ruta que definen la lógica que se ejecutará cuando se acceda a una determinada URL
 @app.route('/', methods=['GET', 'POST'])
 def home():
     session.clear()
@@ -67,6 +31,10 @@ def home():
 
 @app.route("/chat")
 def chat():
+    if request.method == "POST":
+        exit = request.form.get("exit", False)
+        if exit != False:
+            return redirect(url_for("home"))
     # Only available to enter if you have gone through the home page first
     if chat is None or session.get("name") is None:
         return redirect(url_for("home"))
@@ -79,9 +47,16 @@ def get_weather(city):
     BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
     API_KEY = "f1b1af4594b289ef32467e44f61e0830"
     url = BASE_URL + "appid=" + API_KEY + "&q=" + city
+    error=False
 
-    response = requests.get(url).json()
-    data = {
+    weather_info = requests.get(url)
+    print(weather_info)
+    if weather_info.status_code == 404:
+        error= True
+        data={}
+    else:
+        response= weather_info.json()
+        data = {
         'temp_kelvin': response['main']['temp'],
         'temp_celsius': kelvin_to_celsius_fahrenheit(response['main']['temp'])[0],
         'temp_fahrenheit': kelvin_to_celsius_fahrenheit(response['main']['temp'])[1],
@@ -93,8 +68,8 @@ def get_weather(city):
         'description': response['weather'][0]['description'],
         'sunrise_time': str(dt.datetime.utcfromtimestamp(response['sys']['sunrise'] + response['timezone'])),
         'sunset_time': str(dt.datetime.utcfromtimestamp(response['sys']['sunset'] + response['timezone']))
-    }
-    return data
+        }
+    return error, data
 
 
 @socketio.on("message")  # Aqui haurem de agafar nosaltres el text de weather
@@ -107,51 +82,50 @@ def get_data(data):
     input_string = data["data"].lower()
     print(f"{input_string}")
     words = input_string.split()
-    if input_string("weather") != -1:
+    print(words)
+    if words[0]=='weather':
         if len(words) >= 2:
             city = ''
             for i in range(1, len(words)):
                 city += words[i]+' '
             print(city)
-            weather_data = get_weather(city)
+            error, weather_data= get_weather(city)
             content = {
                 "name": 'Server',
-                "message": get_weather_results(city, weather_data)
+                "message": get_weather_results(city, weather_data, error)
             }
             send(content)
-            print(f"Weather data: {get_weather_results(city,weather_data)}")
+            print(f"Weather data: {get_weather_results(city,weather_data, error)}")
         pass
 
-    elif input_string.find("translate") != -1:
-        text_to_translate = ""
+    elif words[0]=='translate':
+        text_to_translate = ''
         for i in range(3, len(words)):
-            text_to_translate += words[i]+" "
+            text_to_translate += words[i]+' '
         lang= words[2]
+        #print(text_to_translate)
+        #print(lang)
         if checkLanguageCode(lang):
-            translation = translate(text_to_translate, words[2])
+            translation = translate(text_to_translate, lang)
             msg= translation.text
         else:
-            msg="Language not found. You can find the available languages here: https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages"
+            link = "https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages "
+            link_text = "Language not found. You can find the available languages by clicking here."
+            msg = f'<a href="{link}">{link_text}</a>'
+        
         content = {
         "name": 'Server',
         "message": msg
         }
         send(content)
         pass
+    
     else: 
-        if input_string.find("hola")!= -1:
-            content = {
-                "name": 'Server',
-              "message": "Hola! En que et puc ajudar? Prova de dir: \n Weather (Ciutat) --> Per saber el temps que fa en la ciutat elegida \n Translate to EN (La frase) --> Per traduir la frase que vulguis"
-            }
-            send(content)
-
-        elif input_string.find("Com estás?")!= -1:
-            content = {
-            "name": 'Server',
-            "message": "Hola! En que et puc ajudar? Prova de dir: \n Weather (Ciutat) --> Per saber el temps que fa en la ciutat elegida \n Translate to EN (La frase) --> Per traduir la frase que vulguis"
-        }
+        content = {
+        "name": 'Server',
+        "message": "Hi! How can I help you out? You can say: \n Weather [city] --> To know the weather in the selected city\n Translate to [language code] [text to translate] --> To translate the text you want\n Some common language codes are:\n EN (English)\n ES (Spanish)\n DE (German)\n FR (French)"          }
         send(content)
+
 
     print(f"{session.get('name')} said: {data['data']}")
 
