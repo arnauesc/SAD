@@ -29,12 +29,11 @@ def home():
     return render_template("home.html", boolean=True)
 
 
-@app.route("/chat")
+@app.route("/chat", methods=["GET", "POST"])
 def chat():
     if request.method == "POST":
-        exit = request.form.get("exit", False)
-        if exit != False:
-            return redirect(url_for("home"))
+        return redirect(url_for("home"))
+
     # Only available to enter if you have gone through the home page first
     if chat is None or session.get("name") is None:
         return redirect(url_for("home"))
@@ -100,19 +99,21 @@ def get_data(data):
 
     elif words[0]=='translate':
         text_to_translate = ''
-        for i in range(3, len(words)):
-            text_to_translate += words[i]+' '
-        lang= words[2]
-        #print(text_to_translate)
-        #print(lang)
-        if checkLanguageCode(lang):
-            translation = translate(text_to_translate, lang)
-            msg= translation.text
+        if(len(words)>3):
+            for i in range(3, len(words)):
+                text_to_translate += words[i]+' '
+            lang= words[2]
+            #print(text_to_translate)
+             #print(lang)
+            if checkLanguageCode(lang):
+                translation = translate(text_to_translate, lang)
+                msg= translation.text
+            else:
+                link = "https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages "
+                link_text = "Language not found. You can find the available languages by clicking here."
+                msg = f'<a href="{link}">{link_text}</a>'
         else:
-            link = "https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages "
-            link_text = "Language not found. You can find the available languages by clicking here."
-            msg = f'<a href="{link}">{link_text}</a>'
-        
+            msg = "Incorrect input --> Translate to [language code] [text to translate]"
         content = {
         "name": 'Server',
         "message": msg

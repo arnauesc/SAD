@@ -72,6 +72,7 @@ body {
 	cursor: pointer;
 }
 
+
 .screen-chat .header { 
 	background: #111;
 	height: 50px;
@@ -95,7 +96,7 @@ font-weight: 500;
 } 
 .screen-chat .messages{
 	width: 100%;
-	height: calc(100%-100px);
+	height: 90vh;
 	background: #e6e6e6;
 	overflow: auto; /* Agregar la propiedad overflow */
 }
@@ -127,11 +128,6 @@ font-weight: 500;
 	word-wrap: break-word;
 }
 
-.screen-chat .messages .update{
-	text-align: center;
-	padding: 8px;
-	font-style: sans-serif;
-}
 
 .screen-chat .typebox{
 	width: 100%;
