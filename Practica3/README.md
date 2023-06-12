@@ -11,7 +11,7 @@ Repository
 - The usernames are saved in a JList using a DefaultListModel
 
 ## Usage
-Once the application is launched, users can interact with the graphical interface to send and receive chat messages. The clients can choose a username and join the chat.
+Once the application is launched, users can interact with the graphical interface to send and receive chat messages. The clients can choose a username and join the chat. The main screen is divided in two sections, one with the list of users and the other with the chat area.
 
 
 ## !!Note:
