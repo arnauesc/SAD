@@ -11,5 +11,3 @@ This project, developed by Arnau Escolà and Carlota Julbe, is a part of the SAD
 #### Mouse Functionality
 - We have implemented some basic mouse movements and interactions as part of the project's features.
 
-## Repository
-You can find the project files in our repository. Please click [here](https://github.com/cjulbe/SAD/tree/main/Practica1_MVC) to download the project files.
