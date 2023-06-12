@@ -13,16 +13,18 @@ public class EchoServer {
                 public void run(){
                     String username= s.readLine();
                     while (users.containsKey(username)) {
+                        s.println("Exist");
                         username = s.readLine();
+
                     }
 
                     s.println("No_Exist");
                     users.put(username, s);
                     System.out.println(username + " joined the chat");
-                    String line = username;;
+                    String line;
                     while((line=s.readLine())!=null){
 
-                        if(line.matches("exit")){
+                        if(line.contains("Exit")){
                             System.out.println(username+" left the chat");
                             users.remove(username);
                         }

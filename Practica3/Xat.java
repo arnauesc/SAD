@@ -55,10 +55,6 @@ public class Xat {
 
         // Create an output JPanel and add a JList with the messages inside a
         // JScrollPane
-        JPanel usernamesTaken = new JPanel();
-        usernamesTaken.setLayout(new BoxLayout(usernamesTaken, BoxLayout.LINE_AXIS));
-        users_list.setBackground(new Color(170, 74, 68));
-        JLabel label = new JLabel("Usernames taken:");
 
         JPanel enterUsername = new JPanel();
         enterUsername.setLayout(new BoxLayout(enterUsername, BoxLayout.PAGE_AXIS));
@@ -68,11 +64,6 @@ public class Xat {
         button.addActionListener(new EnterServerButtonListener());
 
 
-        usernamesTaken.add(label);
-        usernamesTaken.add(new JScrollPane(users_list));
-        usernamesTaken.setMaximumSize(
-                new Dimension(usernamesTaken.getMaximumSize().width, usernamesTaken.getMinimumSize().height));
-
         enterUsername.add(labelNewUser);
         enterUsername.add(userText);
         enterUsername.add(button);
@@ -80,7 +71,6 @@ public class Xat {
                 new Dimension(enterUsername.getMaximumSize().width, enterUsername.getMinimumSize().height));
 
         // add panels to main frame
-        iniciXat.add(usernamesTaken, BorderLayout.CENTER);
         iniciXat.add(enterUsername, BorderLayout.PAGE_END);
 
         // Display the window centered.
@@ -104,9 +94,11 @@ public class Xat {
         pantallaPrincipal.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                socket.println("Exit");
+                socket.println("Exit " +username );
+                llistaUsuaris("Exit " + username);
             }
         }); 
+
             
         
         // Create an output JPanel and add a JTextArea(20, 30) inside a JScrollPane
@@ -115,8 +107,20 @@ public class Xat {
         output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
         messages.setEditable(false);
         output.add(new JScrollPane(messages));
-        pantallaPrincipal.add(output);
 
+
+         // Create the list and put it in a scroll pane.
+         JLabel usersLabel= new JLabel("Users available");
+         output.add(usersLabel);
+ 
+         // Create a list available users 
+
+         users_list.setBackground(new Color(0, 255, 0));
+         JScrollPane scrollPane = new JScrollPane(users_list);
+         scrollPane.setMaximumSize(new Dimension(scrollPane.getMaximumSize().width, scrollPane.getMinimumSize().height));
+         output.add(scrollPane);
+         output.add(new JScrollPane(messages));
+        
         // Create an input JPanel and add a JTextField(25) and a JButton
         input = new JTextPane();
         input.setLayout(new BoxLayout(input, BoxLayout.LINE_AXIS));
@@ -178,9 +182,9 @@ public class Xat {
                     popUpErrorMessage("The user already exist");
                 }
                 else{
+                    llistaUsuaris(username);
                     iniciXat.setVisible(false);
                     pantallaPrincipal();
-                    llistaUsuaris(username);
                     startListenning();
                 }
                 
@@ -200,8 +204,13 @@ public class Xat {
                 try {
                     while ((line = socket.readLine()) != null) {
                         messages.append(line + " \n");
-                        if(line.contains("exit")){
+                        
+                        if(line.contains("Exit")){
                             llistaUsuaris(line);
+                        }
+                        else{
+                            String[] parts = line.split(":");
+                            llistaUsuaris(parts[0]);
                         }
                     }
                 } catch (Exception ex) {
@@ -219,18 +228,23 @@ public class Xat {
     }
 
     public void llistaUsuaris(String username) {
-        if (username.contains("exit")) {
-            String name = username.substring(6);
+        if (username.contains("Exit")) {
+            String name = username.substring(5);
             if (users.contains(name)) {
                 users.remove(name);
-                System.out.println("Eliminem NOM");
+                listModel.removeElement(name);
+                System.out.println("Eliminem NOM" + name);
             }
         } else {
-            String name = username.substring(2);
+            String name = username.substring(0);
             if (!users.contains(name)) {
                 users.add(name);
                 listModel.addElement(name);
-                socket.println(name);
+                
+                for(int i = 0; i< users.size(); i++ ){
+                    System.out.println(users_list.getModel().getElementAt(i));
+                }
+                /*socket.println(name);*/
                 System.out.println("Afegim NOM " + name);
             }
         }
